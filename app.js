@@ -63,13 +63,6 @@ app.use(mongoSanitize());
 // Data sanitization against XSS
 app.use(xss());
 
-// Sets request time
-// app.use((req, res, next) => {
-//   req.requestTime = new Date().toISOString();
-//   console.log('🚀 ~ app.use ~ req.cookies:', req.cookies.jwt);
-//   next();
-// });
-
 // Prevent parameter pollution
 app.use(
   hpp({

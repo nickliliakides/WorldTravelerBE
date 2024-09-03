@@ -12,7 +12,6 @@ const filterObj = (obj, ...allowedFIelds) => {
 
 exports.getMe = (req, res, next) => {
   const { user } = req;
-  console.log('🚀 ~ user:', user);
 
   if (!user) {
     return next(new AppError('User details can not be found', 404));
