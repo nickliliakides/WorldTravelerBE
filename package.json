@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "start:dev": "nodemon server.js",
-    "start:prod": "NODE_ENV=production nodemon server.js",
-    "debug": "ndb server.js"
+    "start": "node api/index.js",
+    "start:dev": "nodemon api/index.js",
+    "start:prod": "NODE_ENV=production nodemon api/index.js",
+    "debug": "ndb api/index.js"
   },
   "author": "",
   "license": "ISC",
