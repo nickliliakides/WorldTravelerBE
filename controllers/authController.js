@@ -49,7 +49,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const { name, email, password, passwordConfirm } = req.body;
   const user = await User.create({ name, email, password, passwordConfirm });
 
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars, node/no-unsupported-features/es-syntax
   const { password: _userPassword, __v, ...rest } = user._doc;
 
   createAndSendToken(rest, res, 201, true);
@@ -68,7 +68,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect credentials', 401));
   }
 
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars, node/no-unsupported-features/es-syntax
   const { password: _userPassword, __v, ...rest } = user._doc;
 
   createAndSendToken(rest, res, 200, true);

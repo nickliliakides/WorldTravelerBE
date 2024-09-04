@@ -32,7 +32,10 @@ mongoose
 // Sets security HTTP headers
 app.use(helmet());
 
-const whitelist = ['http://localhost:3000', 'http://localhost:5173'];
+const whitelist = [
+  'http://localhost:3000',
+  'https://world-traveler-rho.vercel.app',
+];
 app.use(cors({ origin: whitelist, credentials: true }));
 // app.options('*', cors());
 
