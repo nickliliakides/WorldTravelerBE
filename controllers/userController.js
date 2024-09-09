@@ -1,21 +1,13 @@
 const multer = require('multer');
+const sharp = require('sharp');
 const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/img/users');
-  },
-  filename: (req, file, cb) => {
-    const ext = file.mimetype.split('/')[1];
-    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-  },
-});
+const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
   const fileSize = parseInt(req.headers['content-length'], 10);
-  console.log('🚀 ~ multerFilter ~ fileSize:', fileSize);
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
   } else {
@@ -24,12 +16,12 @@ const multerFilter = (req, file, cb) => {
       false,
     );
   }
-  if (fileSize < 500000) {
+  if (fileSize < 3000000) {
     cb(null, true);
   } else {
     cb(
       new AppError(
-        'File is too large. For a profile image, only files smaller than 500KB are accepted.',
+        'File is too large. For a profile image, only files smaller than 3MB are accepted.',
         400,
       ),
       false,
@@ -64,9 +56,21 @@ exports.getMe = (req, res, next) => {
 
 exports.uploadUserPhoto = upload.single('photo');
 
+exports.resizeUserPhoto = (req, res, next) => {
+  if (!req.file) return next();
+
+  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+
+  sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/users/${req.file.filename}`);
+
+  next();
+};
+
 exports.updateMe = catchAsync(async (req, res, next) => {
-  console.log('🚀 ~ exports.updateMe=catchAsync ~ req file:', req.file);
-  console.log('🚀 ~ exports.updateMe=catchAsync ~ req body:', req.body);
   // Create error if user post password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(
