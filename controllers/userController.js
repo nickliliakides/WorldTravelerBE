@@ -8,6 +8,7 @@ const { handleImageUpload } = require('../utils/cloudinaryConfig');
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
+  if (file.originalname === 'undefined') return;
   console.log('🚀 ~ multerFilter ~ file:', file);
   const fileSize = parseInt(req.headers['content-length'], 10);
   console.log('🚀 ~ multerFilter ~ fileSize:', fileSize);
@@ -63,7 +64,7 @@ exports.getMe = (req, res, next) => {
 exports.uploadUserPhoto = upload.single('photo');
 
 exports.uploadPhotoToCoudinary = catchAsync(async (req, res, next) => {
-  if (!req.file.size) next();
+  if (req.file.originalname === 'undefined') next();
   console.log(
     '🚀 ~ exports.uploadPhotoToCoudinary=catchAsync ~ file:',
     req.file,
