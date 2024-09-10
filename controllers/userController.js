@@ -8,8 +8,7 @@ const { handleImageUpload } = require('../utils/cloudinaryConfig');
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
-  if (!file) return;
-  // const fileSize = parseInt(req.headers['content-length'], 10);
+  const fileSize = parseInt(req.headers['content-length'], 10);
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
   } else {
@@ -18,17 +17,17 @@ const multerFilter = (req, file, cb) => {
       false,
     );
   }
-  // if (fileSize < 3000000) {
-  //   cb(null, true);
-  // } else {
-  //   cb(
-  //     new AppError(
-  //       'File is too large. For a profile image, only files smaller than 3MB are accepted.',
-  //       400,
-  //     ),
-  //     false,
-  //   );
-  // }
+  if (fileSize < 3000000) {
+    cb(null, true);
+  } else {
+    cb(
+      new AppError(
+        'File is too large. For a profile image, only files smaller than 3MB are accepted.',
+        400,
+      ),
+      false,
+    );
+  }
 };
 
 const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
