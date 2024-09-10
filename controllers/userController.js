@@ -50,7 +50,7 @@ exports.getMe = (req, res, next) => {
 exports.uploadUserPhoto = upload.single('photo');
 
 exports.uploadPhotoToCoudinary = catchAsync(async (req, res, next) => {
-  if (req.file && req.file.originalname === 'undefined') next();
+  if (!req.file || (req.file && req.file.originalname === 'undefined')) next();
 
   const b64 = Buffer.from(req.file.buffer).toString('base64');
   const dataURI = `data:${req.file.mimetype};base64,${b64}`;
