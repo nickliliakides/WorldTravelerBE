@@ -33,7 +33,7 @@ const multerFilter = (req, file, cb) => {
 
 const upload = multer({
   storage: multerStorage,
-  //  fileFilter: multerFilter
+  fileFilter: multerFilter,
 });
 
 const filterObj = (obj, ...allowedFIelds) => {
@@ -62,7 +62,7 @@ exports.getMe = (req, res, next) => {
 exports.uploadUserPhoto = upload.single('photo');
 
 exports.uploadPhotoToCoudinary = catchAsync(async (req, res, next) => {
-  if (!req.file) next();
+  if (!req.file.size) next();
   console.log(
     '🚀 ~ exports.uploadPhotoToCoudinary=catchAsync ~ file:',
     req.file,
