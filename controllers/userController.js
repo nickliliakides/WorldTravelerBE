@@ -8,8 +8,7 @@ const { handleImageUpload } = require('../utils/cloudinaryConfig');
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
-  console.log('🚀 ~ multerFilter ~ file:', file);
-  console.log('🚀 ~ multerFilter ~ req:', req);
+  if (!file) return;
   // const fileSize = parseInt(req.headers['content-length'], 10);
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
@@ -35,10 +34,8 @@ const multerFilter = (req, file, cb) => {
 const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
 const filterObj = (obj, ...allowedFIelds) => {
-  console.log('🚀 ~ filterObj ~ obj:', obj);
   const newObj = {};
   Object.keys(obj).forEach((key) => {
-    console.log('🚀 ~ Object.keys ~ key:', key);
     if (allowedFIelds.includes(key)) newObj[key] = obj[key];
   });
   return newObj;

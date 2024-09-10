@@ -29,9 +29,8 @@ router.route('/reset-password/:token').patch(resetPassword);
 router.use(protect);
 
 router.route('/update-my-password').patch(updatePassword);
-router.route('/update-me').patch(updateMe);
 router
-  .route('/update-me-with-image')
+  .route('/update-me')
   .patch(uploadUserPhoto, uploadPhotoToCoudinary, updateMe);
 router.route('/delete-me').delete(deleteMe);
 router.route('/me').get(getMe);
