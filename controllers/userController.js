@@ -9,28 +9,14 @@ const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
   if (file.originalname === 'undefined') cb(null, false);
-  console.log('🚀 ~ multerFilter ~ file:', file);
-  const fileSize = parseInt(req.headers['content-length'], 10);
-  console.log('🚀 ~ multerFilter ~ fileSize:', fileSize);
-  // if (file.mimetype.startsWith('image')) {
-  //   cb(null, true);
-  // } else {
-  //   cb(
-  //     new AppError('File is not an image. Only image files are accepted.', 400),
-  //     false,
-  //   );
-  // }
-  // if (fileSize < 3000000) {
-  //   cb(null, true);
-  // } else {
-  //   cb(
-  //     new AppError(
-  //       'File is too large. For a profile image, only files smaller than 3MB are accepted.',
-  //       400,
-  //     ),
-  //     false,
-  //   );
-  // }
+  else if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(
+      new AppError('File is not an image. Only image files are accepted.', 400),
+      false,
+    );
+  }
 };
 
 const upload = multer({
@@ -64,7 +50,7 @@ exports.getMe = (req, res, next) => {
 exports.uploadUserPhoto = upload.single('photo');
 
 exports.uploadPhotoToCoudinary = catchAsync(async (req, res, next) => {
-  if (req.file.originalname === 'undefined') next();
+  // if (req.file.originalname === 'undefined') next();
   console.log(
     '🚀 ~ exports.uploadPhotoToCoudinary=catchAsync ~ file:',
     req.file,
@@ -91,7 +77,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   // Update user document
   const filteredBody = filterObj(req.body, 'name', 'email', 'photo');
 
-  if (req.file) filteredBody.photo = req.file.filename;
+  if (req.file && req.file.filename) filteredBody.photo = req.file.filename;
   else filteredBody.photo = undefined;
 
   const user = await User.findByIdAndUpdate(req.user.id, filteredBody, {
