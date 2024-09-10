@@ -33,8 +33,10 @@ const multerFilter = (req, file, cb) => {
 const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 
 const filterObj = (obj, ...allowedFIelds) => {
+  console.log('🚀 ~ filterObj ~ obj:', obj);
   const newObj = {};
   Object.keys(obj).forEach((key) => {
+    console.log('🚀 ~ Object.keys ~ key:', key);
     if (allowedFIelds.includes(key)) newObj[key] = obj[key];
   });
   return newObj;
