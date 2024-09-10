@@ -91,6 +91,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   // Update user document
   const filteredBody = filterObj(req.body, 'name', 'email', 'photo');
+  console.log('🚀 ~ exports.updateMe=catchAsync ~ req.body:', req.body);
   console.log('🚀 ~ exports.updateMe=catchAsync ~ filteredBody:', filteredBody);
 
   if (req.file) filteredBody.photo = req.file.filename;
