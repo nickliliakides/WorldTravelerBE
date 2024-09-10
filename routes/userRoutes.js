@@ -16,7 +16,7 @@ const {
   getUser,
   getMe,
   uploadUserPhoto,
-  resizeUserPhoto,
+  uploadPhotoToCoudinary,
 } = require('../controllers/userController');
 
 router.route('/signup').post(signup);
@@ -29,7 +29,9 @@ router.route('/reset-password/:token').patch(resetPassword);
 router.use(protect);
 
 router.route('/update-my-password').patch(updatePassword);
-router.route('/update-me').patch(uploadUserPhoto, resizeUserPhoto, updateMe);
+router
+  .route('/update-me')
+  .patch(uploadUserPhoto, uploadPhotoToCoudinary, updateMe);
 router.route('/delete-me').delete(deleteMe);
 router.route('/me').get(getMe);
 router.route('/:userId').get(restrict, getUser);
