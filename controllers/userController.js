@@ -7,28 +7,29 @@ const { handleImageUpload } = require('../utils/cloudinaryConfig');
 
 const multerStorage = multer.memoryStorage();
 
-// const multerFilter = (req, file, cb) => {
-//   const fileSize = parseInt(req.headers['content-length'], 10);
-//   if (file.mimetype.startsWith('image')) {
-//     cb(null, true);
-//   } else {
-//     cb(
-//       new AppError('File is not an image. Only image files are accepted.', 400),
-//       false,
-//     );
-//   }
-//   if (fileSize < 3000000) {
-//     cb(null, true);
-//   } else {
-//     cb(
-//       new AppError(
-//         'File is too large. For a profile image, only files smaller than 3MB are accepted.',
-//         400,
-//       ),
-//       false,
-//     );
-//   }
-// };
+const multerFilter = (req, file, cb) => {
+  const fileSize = parseInt(req.headers['content-length'], 10);
+  console.log('🚀 ~ multerFilter ~ fileSize:', fileSize);
+  // if (file.mimetype.startsWith('image')) {
+  //   cb(null, true);
+  // } else {
+  //   cb(
+  //     new AppError('File is not an image. Only image files are accepted.', 400),
+  //     false,
+  //   );
+  // }
+  // if (fileSize < 3000000) {
+  //   cb(null, true);
+  // } else {
+  //   cb(
+  //     new AppError(
+  //       'File is too large. For a profile image, only files smaller than 3MB are accepted.',
+  //       400,
+  //     ),
+  //     false,
+  //   );
+  // }
+};
 
 const upload = multer({
   storage: multerStorage,
@@ -62,11 +63,15 @@ exports.uploadUserPhoto = upload.single('photo');
 
 exports.uploadPhotoToCoudinary = catchAsync(async (req, res, next) => {
   if (!req.file) next();
+  console.log(
+    '🚀 ~ exports.uploadPhotoToCoudinary=catchAsync ~ file:',
+    req.file,
+  );
 
-  const b64 = Buffer.from(req.file.buffer).toString('base64');
-  const dataURI = `data:${req.file.mimetype};base64,${b64}`;
-  const cldRes = await handleImageUpload(dataURI);
-  req.file.filename = cldRes.secure_url;
+  // const b64 = Buffer.from(req.file.buffer).toString('base64');
+  // const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+  // const cldRes = await handleImageUpload(dataURI);
+  // req.file.filename = cldRes.secure_url;
   next();
 });
 
