@@ -50,16 +50,12 @@ exports.getMe = (req, res, next) => {
 exports.uploadUserPhoto = upload.single('photo');
 
 exports.uploadPhotoToCoudinary = catchAsync(async (req, res, next) => {
-  // if (req.file.originalname === 'undefined') next();
-  console.log(
-    '🚀 ~ exports.uploadPhotoToCoudinary=catchAsync ~ file:',
-    req.file,
-  );
+  if (req.file && req.file.originalname === 'undefined') next();
 
-  // const b64 = Buffer.from(req.file.buffer).toString('base64');
-  // const dataURI = `data:${req.file.mimetype};base64,${b64}`;
-  // const cldRes = await handleImageUpload(dataURI);
-  // req.file.filename = cldRes.secure_url;
+  const b64 = Buffer.from(req.file.buffer).toString('base64');
+  const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+  const cldRes = await handleImageUpload(dataURI);
+  req.file.filename = cldRes.secure_url;
   next();
 });
 
