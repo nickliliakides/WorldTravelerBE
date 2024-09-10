@@ -8,6 +8,7 @@ const { handleImageUpload } = require('../utils/cloudinaryConfig');
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
+  console.log('🚀 ~ multerFilter ~ req:', req);
   // const fileSize = parseInt(req.headers['content-length'], 10);
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
@@ -62,20 +63,9 @@ exports.uploadUserPhoto = upload.single('photo');
 exports.uploadPhotoToCoudinary = catchAsync(async (req, res, next) => {
   if (!req.file) next();
 
-  console.log(
-    '🚀 ~ exports.uploadPhotoToCoudinary=catchAsync ~ req.file:',
-    req.file,
-  );
-
   const b64 = Buffer.from(req.file.buffer).toString('base64');
-  console.log('🚀 ~ exports.uploadPhotoToCoudinary=catchAsync ~ b64:', b64);
-
   const dataURI = `data:${req.file.mimetype};base64,${b64}`;
   const cldRes = await handleImageUpload(dataURI);
-  console.log(
-    '🚀 ~ exports.uploadPhotoToCoudinary=catchAsync ~ dataURI:',
-    dataURI,
-  );
   req.file.filename = cldRes.secure_url;
   next();
 });
@@ -93,8 +83,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   // Update user document
   const filteredBody = filterObj(req.body, 'name', 'email', 'photo');
-  console.log('🚀 ~ exports.updateMe=catchAsync ~ req.body:', req.body);
-  console.log('🚀 ~ exports.updateMe=catchAsync ~ filteredBody:', filteredBody);
 
   if (req.file) filteredBody.photo = req.file.filename;
   else filteredBody.photo = undefined;
