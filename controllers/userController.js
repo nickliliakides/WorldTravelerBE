@@ -8,6 +8,7 @@ const { handleImageUpload } = require('../utils/cloudinaryConfig');
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
+  console.log('🚀 ~ multerFilter ~ file:', file);
   const fileSize = parseInt(req.headers['content-length'], 10);
   console.log('🚀 ~ multerFilter ~ fileSize:', fileSize);
   // if (file.mimetype.startsWith('image')) {
