@@ -61,8 +61,8 @@ exports.uploadPhotoToCoudinary = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
 
   const b64 = Buffer.from(req.file.buffer).toString('base64');
-  // eslint-disable-next-line prefer-template
-  const dataURI = 'data:' + req.file.mimetype + ';base64,' + b64;
+
+  const dataURI = `data:${req.file.mimetype};base64,${b64}`;
   const cldRes = await handleImageUpload(dataURI);
   req.file.filename = cldRes.secure_url;
   next();
