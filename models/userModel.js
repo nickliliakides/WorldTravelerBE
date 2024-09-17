@@ -44,14 +44,14 @@ const userSchema = new mongoose.Schema(
         message: 'Passwords are not the same',
       },
     },
-
+    userActivationToken: String,
+    userActivationExpires: Date,
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
     active: {
       type: Boolean,
-      default: true,
-      select: false,
+      default: false,
     },
   },
   {
@@ -64,11 +64,6 @@ userSchema.virtual('cities', {
   ref: 'City',
   foreignField: 'user',
   localField: '_id',
-});
-
-userSchema.pre(/^find/, function (next) {
-  this.find({ active: { $ne: false } });
-  next();
 });
 
 userSchema.pre('save', async function (next) {
@@ -109,17 +104,27 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   return false;
 };
 
-userSchema.methods.createPasswordResetToken = function () {
-  const resetToken = crypto.randomBytes(32).toString('hex');
+userSchema.methods.createToken = function (reason) {
+  const token = crypto.randomBytes(32).toString('hex');
 
-  this.passwordResetToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
+  if (reason === 'passwordReset') {
+    this.passwordResetToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
 
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  }
+  if (reason === 'userActivation') {
+    this.userActivationToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
 
-  return resetToken;
+    this.userActivationExpires = Date.now() + 30 * 24 * 60 * 60 * 1000;
+  }
+
+  return token;
 };
 
 const User = mongoose.model('User', userSchema);

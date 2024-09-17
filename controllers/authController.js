@@ -2,12 +2,13 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const crypto = require('crypto');
-// const cookieToken = require('../utils/cookieToken');
+
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 const City = require('../models/cityModel');
+const Email = require('../utils/email');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JTW_SECRET, {
@@ -23,8 +24,6 @@ const createAndSendToken = (user, res, statusCode = 200, sendUser = false) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'none',
-    // secure: true,
-    // secure: req.secure || req.headers('x-forwarded-proto') === 'https',
   };
 
   res.cookie('jwt', token, cookieOptions);
@@ -44,6 +43,38 @@ const createAndSendToken = (user, res, statusCode = 200, sendUser = false) => {
         token,
       });
 };
+const createActivationToken = async (user, req, res, next) => {
+  const activationToken = user.createToken('userActivation');
+
+  await user.save({ validateBeforeSave: false });
+
+  const activateURL = `${process.env.CLIENT_BASE_URL}/user/activation/${activationToken}`;
+
+  const message =
+    'Please click or copy and paste the link below to activate your account.';
+
+  try {
+    await new Email(user, message, activateURL).sendWelcome();
+
+    res.status(201).json({
+      status: 'success',
+      message:
+        'User created! Activation link sent to your email! Please activate your account in order to use the application.',
+    });
+  } catch (err) {
+    console.log('🚀 ~ createActivationToken ~ err:', err);
+    user.userActivationToken = undefined;
+    user.userActivationExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        'Confirmation email error!!! User created but activation failed and is not able to login. Please contact your administrator!',
+      ),
+      500,
+    );
+  }
+};
 
 exports.signup = catchAsync(async (req, res, next) => {
   const { name, email, password, passwordConfirm } = req.body;
@@ -52,7 +83,31 @@ exports.signup = catchAsync(async (req, res, next) => {
   // eslint-disable-next-line no-unused-vars, node/no-unsupported-features/es-syntax
   const { password: _userPassword, __v, ...rest } = user._doc;
 
-  createAndSendToken(rest, res, 201, true);
+  createActivationToken(user, req, res, next);
+});
+
+exports.activateUser = catchAsync(async (req, res, next) => {
+  // Get user based on the token
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    userActivationToken: hashedToken,
+    // userActivationExpires: { $gt: Date.now() },
+  });
+
+  // if token has not expired, and there is a user activate user
+  if (!user) {
+    return next(new AppError('Activation Token is invalid or expired'), 400);
+  }
+  user.active = true;
+  user.userActivationToken = undefined;
+  user.userActivationExpires = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  createAndSendToken(user, res, 200, true);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -66,6 +121,15 @@ exports.login = catchAsync(async (req, res, next) => {
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect credentials', 401));
+  }
+
+  if (!user.active) {
+    return next(
+      new AppError(
+        'User is not activated or has been deleted his/her account. Please check your email for activation link, if you have recently registered.',
+        401,
+      ),
+    );
   }
 
   // eslint-disable-next-line no-unused-vars, node/no-unsupported-features/es-syntax
@@ -143,7 +207,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 
   // Generate the random reset token
-  const resetToken = user.createPasswordResetToken();
+  const resetToken = user.createToken('passwordReset');
   await user.save({ validateBeforeSave: false });
 
   try {

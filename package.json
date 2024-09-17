@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node api/index.js",
     "dev": "nodemon api/index.js",
-    "start:prod": "NODE_ENV=production nodemon api/index.js",
+    "prod": "NODE_ENV=production nodemon api/index.js",
     "debug": "ndb api/index.js"
   },
   "author": "",

@@ -9,6 +9,7 @@ const {
   updatePassword,
   protect,
   restrict,
+  activateUser,
 } = require('../controllers/authController');
 const {
   updateMe,
@@ -23,6 +24,7 @@ router.route('/signup').post(signup);
 router.route('/login').post(login);
 
 router.route('/forgot-password').post(forgotPassword);
+router.get('/activate/:token', activateUser);
 router.route('/reset-password/:token').patch(resetPassword);
 
 // Protect routes below this middleware
