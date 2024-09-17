@@ -59,7 +59,7 @@ const createActivationToken = async (user, req, res, next) => {
     res.status(201).json({
       status: 'success',
       message:
-        'User created! Activation link sent to your email! Please activate your account in order to use the application.',
+        '✅ User created! Activation link sent to your email! ☑️ Please activate your account in order to use the application.',
     });
   } catch (err) {
     console.log('🚀 ~ createActivationToken ~ err:', err);
