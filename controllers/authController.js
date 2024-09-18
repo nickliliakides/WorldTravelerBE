@@ -205,17 +205,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // Generate the random reset token
   const resetToken = user.createToken('passwordReset');
-  console.log(
-    '🚀 ~ exports.forgotPassword=catchAsync ~ resetToken:',
-    resetToken,
-  );
   await user.save({ validateBeforeSave: false });
-  console.log('🚀 ~ exports.forgotPassword=catchAsync ~ user:', user);
 
   const resetURL = `${process.env.CLIENT_BASE_URL}/password/reset/${resetToken}`;
-  console.log('🚀 ~ exports.forgotPassword=catchAsync ~ resetURL:', resetURL);
   // await new Email(user, resetURL).sendPasswordReset();
-  const message = `Forgot your password? Please click the link below to reset it. If you haven't forget your password, please ignore this email.`;
+  const message = `Forgot your password? Please click the link below to reset it. If you haven't requested password reset, please ignore this email.`;
 
   // Send token to users's email
   try {
@@ -226,7 +220,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       message: '✅ Token sent to email successfully!',
     });
   } catch (err) {
-    console.log('🚀 ~ exports.forgotPassword=catchAsync ~ err:', err);
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
