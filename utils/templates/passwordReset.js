@@ -18,10 +18,9 @@ const passwordReset = (message, url) => `<!DOCTYPE html>
         <tr>
             <td style="background-color: #999592; margin: 0 auto;">
                 <p style="box-sizing: border-box; color: white; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0.5px; line-height: 1.4; margin: 0; padding: 15px 25px; text-align: center; font-size:13px">
-                  ${message}
-                  \n\n
-                  <a style="margin: 12px 0;" href=${url}>${url}</a>
-                </p>                 
+                  ${message}            
+                </p>      
+                <a style="margin: 12px 0;" href=${url}>${url}</a>           
               </td>
         </tr>
       </table>
