@@ -1,12 +1,9 @@
-// const { hash, compare } = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const crypto = require('crypto');
-
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const sendEmail = require('../utils/email');
 const City = require('../models/cityModel');
 const Email = require('../utils/email');
 
@@ -43,7 +40,8 @@ const createAndSendToken = (user, res, statusCode = 200, sendUser = false) => {
         token,
       });
 };
-const createActivationToken = async (user, req, res, next) => {
+
+const createAndSendActivationToken = async (user, req, res, next) => {
   const activationToken = user.createToken('userActivation');
 
   await user.save({ validateBeforeSave: false });
@@ -56,13 +54,12 @@ const createActivationToken = async (user, req, res, next) => {
   try {
     await new Email(user, message, activateURL).sendWelcome();
 
-    res.status(201).json({
+    res.status(200).json({
       status: 'success',
       message:
         '✅ User created! Activation link sent to your email! ☑️ Please activate your account in order to use the application.',
     });
   } catch (err) {
-    console.log('🚀 ~ createActivationToken ~ err:', err);
     user.userActivationToken = undefined;
     user.userActivationExpires = undefined;
     await user.save({ validateBeforeSave: false });
@@ -83,7 +80,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   // eslint-disable-next-line no-unused-vars, node/no-unsupported-features/es-syntax
   const { password: _userPassword, __v, ...rest } = user._doc;
 
-  createActivationToken(user, req, res, next);
+  createAndSendActivationToken(user, req, res, next);
 });
 
 exports.activateUser = catchAsync(async (req, res, next) => {
@@ -208,27 +205,30 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // Generate the random reset token
   const resetToken = user.createToken('passwordReset');
+  console.log(
+    '🚀 ~ exports.forgotPassword=catchAsync ~ resetToken:',
+    resetToken,
+  );
   await user.save({ validateBeforeSave: false });
+  console.log('🚀 ~ exports.forgotPassword=catchAsync ~ user:', user);
 
+  const resetURL = `${req.protocol}://${req.get(
+    'host',
+  )}/api/v1/users/password/reset/${resetToken}`;
+  console.log('🚀 ~ exports.forgotPassword=catchAsync ~ resetURL:', resetURL);
+  // await new Email(user, resetURL).sendPasswordReset();
+  const message = `Forgot your password? Please click the link below to reset it.\n ${resetURL}\n If you haven't forget your password, please ignore this email.`;
+
+  // Send token to users's email
   try {
-    // Send token to users's email
-    const resetURL = `${req.protocol}://${req.get(
-      'host',
-    )}/api/v1/users/reset-password/${resetToken}`;
-    // await new Email(user, resetURL).sendPasswordReset();
-    const message = `Forgot your password? Please click the link below to reset it.\n ${resetURL}\n If you haven't forget your password, please ignore this email.`;
-
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset link, active for 10 minutes.',
-      message,
-    });
+    await new Email(user, message, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: 'success',
-      message: 'Token sent to email!',
+      message: '✅ Token sent to email successfully!',
     });
   } catch (err) {
+    console.log('🚀 ~ exports.forgotPassword=catchAsync ~ err:', err);
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
