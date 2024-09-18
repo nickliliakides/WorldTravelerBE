@@ -7,7 +7,7 @@ const passwordReset = (message, url) => `<!DOCTYPE html>
       <table class="table" cellpadding="0" cellspacing="0" style="background-color: #eee; empty-cells: hide; margin: 0 auto; padding: 0; width: 600px;">
         <tr>
             <td style="background-color: #999592; margin: 0 auto;">
-              <h1 style="box-sizing: border-box; color: white; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0.5px; line-height: 1.4; margin: 0; padding: 15px 25px; text-align: center; text-transform: uppercase;"> Αλλαγη κωδικου - password Reset </h1>
+              <h1 style="box-sizing: border-box; color: white; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0.5px; line-height: 1.4; margin: 0; padding: 15px 25px; text-align: center; text-transform: uppercase;"> Password Reset </h1>
             </td>
         </tr>
         <tr>
