@@ -18,13 +18,15 @@ const {
   getMe,
   uploadUserPhoto,
   uploadPhotoToCoudinary,
+  emailReceive,
 } = require('../controllers/userController');
 
 router.route('/signup').post(signup);
 router.route('/login').post(login);
 
-router.route('/forgot-password').post(forgotPassword);
 router.get('/activate/:token', activateUser);
+router.route('/forgot-password').post(forgotPassword);
+router.route('/contact').post(emailReceive);
 router.route('/reset-password/:token').patch(resetPassword);
 
 // Protect routes below this middleware

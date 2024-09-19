@@ -1,13 +1,15 @@
 const nodemailer = require('nodemailer');
 const { passwordReset } = require('./templates/passwordReset');
 const { welcome } = require('./templates/welcome');
+const { contact } = require('./templates/contact');
 
 module.exports = class Email {
-  constructor(user, message, url, send = true) {
+  constructor(user, message, url, send = true, subject = undefined) {
     this.to = send ? user.email : process.env.EMAIL_FROM;
     this.firstName = user.name.split(' ')[0];
     this.email = user.email;
     this.message = message;
+    this.subject = subject;
     this.url = url || '';
     this.from = `World Traveler INC <${process.env.EMAIL_FROM}>`;
   }
@@ -40,8 +42,13 @@ module.exports = class Email {
       switch (typeOfEmail) {
         case 'reset':
           return passwordReset(this.message, this.url);
-        // case 'contact':
-        //   return contact(this.firstName, this.email, this.message);
+        case 'contact':
+          return contact(
+            this.firstName,
+            this.email,
+            this.subject,
+            this.message,
+          );
         default:
           return welcome(this.message, this.firstName, this.url);
       }
@@ -69,5 +76,9 @@ module.exports = class Email {
       'Your password reset link, VALID ONLY for 10 minutes.',
       'reset',
     );
+  }
+
+  async receiveMessage() {
+    await this.send('New message from user', 'contact');
   }
 };
