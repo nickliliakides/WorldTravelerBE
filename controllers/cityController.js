@@ -135,7 +135,7 @@ exports.findTopMonth = catchAsync(async (req, res) => {
       },
     },
     {
-      $sort: { total: -1, _id: 1 },
+      $sort: { _id: 1 },
     },
   ]);
 
