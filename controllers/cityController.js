@@ -99,6 +99,7 @@ exports.findTopVisited = catchAsync(async (req, res) => {
     {
       $sort: { total: -1, _id: 1 },
     },
+    { $limit: 10 },
   ]);
 
   const countriesTotal = await City.aggregate([
@@ -111,6 +112,7 @@ exports.findTopVisited = catchAsync(async (req, res) => {
     {
       $sort: { total: -1, _id: 1 },
     },
+    { $limit: 10 },
   ]);
 
   res.status(200).json({
